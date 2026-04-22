@@ -101,7 +101,7 @@ function App() {
             className="mt-16 flex flex-col items-center gap-4"
           >
             <p className="text-sm text-slate-500 uppercase tracking-widest font-bold">
-              Powered by AI Kucing Gacor v2.0
+              Powered by Kucing Gacor v2.0
             </p>
             <div className="flex -space-x-4">
               {[1, 2, 3, 4, 5].map(i => (

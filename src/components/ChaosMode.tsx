@@ -12,8 +12,8 @@ export function ChaosMode() {
   const setChaosMode = useAppStore(state => state.setChaosMode)
   const isChaosMode = useAppStore(state => state.isChaosMode)
   const isCameraActive = useAppStore(state => state.isCameraActive)
-  
-  const lastHandsRef = useRef<{h1: {x: number, y: number}[], h2: {x: number, y: number}[]}>({h1: [], h2: []})
+
+  const lastHandsRef = useRef<{ h1: { x: number, y: number }[], h2: { x: number, y: number }[] }>({ h1: [], h2: [] })
 
   useEffect(() => {
     if (!isCameraActive) return
@@ -49,7 +49,7 @@ export function ChaosMode() {
         }
         detector = await hp.createDetector(model, detectorConfig)
         setModelLoading(false)
-        
+
         detectLoop()
       } catch (err) {
         console.error("Error initializing Chaos Mode:", err)
@@ -58,10 +58,10 @@ export function ChaosMode() {
 
     const detectLoop = async () => {
       if (!detector || !videoRef.current) return
-      
+
       try {
         const hands = await detector.estimateHands(videoRef.current)
-        
+
         // Titik hijau dihilangkan sesuai permintaan user
         const ctx = canvasRef.current?.getContext('2d')
         if (ctx && canvasRef.current && videoRef.current) {
@@ -85,20 +85,20 @@ export function ChaosMode() {
           }
           const currentH1 = getPalmCenter(hands[0])
           const currentH2 = getPalmCenter(hands[1])
-          
+
           if (!lastHandsRef.current || !Array.isArray(lastHandsRef.current.h1)) {
-            lastHandsRef.current = {h1: [], h2: []}
+            lastHandsRef.current = { h1: [], h2: [] }
           }
-          
+
           const histories = lastHandsRef.current
           const prevH1 = histories.h1[histories.h1.length - 1]
-          
+
           let h1, h2;
           if (prevH1) {
             // Cari mana yang lebih dekat dengan posisi Tangan 1 sebelumnya
             const d1 = Math.sqrt(Math.pow(currentH1.x - prevH1.x, 2) + Math.pow(currentH1.y - prevH1.y, 2))
             const d2 = Math.sqrt(Math.pow(currentH2.x - prevH1.x, 2) + Math.pow(currentH2.y - prevH1.y, 2))
-            
+
             if (d1 < d2) {
               h1 = currentH1; h2 = currentH2;
             } else {
@@ -108,19 +108,19 @@ export function ChaosMode() {
             h1 = currentH1; h2 = currentH2;
           }
 
-          histories.h1.push({x: h1.x, y: h1.y})
-          histories.h2.push({x: h2.x, y: h2.y})
-          
+          histories.h1.push({ x: h1.x, y: h1.y })
+          histories.h2.push({ x: h2.x, y: h2.y })
+
           if (histories.h1.length > 15) {
             histories.h1.shift()
             histories.h2.shift()
           }
 
           if (histories.h1.length >= 5) {
-            const getMove = (h: {x: number, y: number}[]) => {
+            const getMove = (h: { x: number, y: number }[]) => {
               let m = 0
-              for(let i=1; i<h.length; i++) {
-                const d = Math.sqrt(Math.pow(h[i].x - h[i-1].x, 2) + Math.pow(h[i].y - h[i-1].y, 2))
+              for (let i = 1; i < h.length; i++) {
+                const d = Math.sqrt(Math.pow(h[i].x - h[i - 1].x, 2) + Math.pow(h[i].y - h[i - 1].y, 2))
                 if (!isNaN(d)) m += d
               }
               return m
@@ -158,11 +158,11 @@ export function ChaosMode() {
   return (
     <div className="fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-8">
       <div className="relative w-full max-w-3xl aspect-[3/4] md:aspect-video rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(250,204,21,0.15)] border-4 border-slate-800 bg-black flex flex-col transition-all duration-500">
-        <video 
-          ref={videoRef} 
-          className="w-full h-full object-cover" 
-          playsInline 
-          muted 
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          playsInline
+          muted
           style={{ transform: 'scaleX(-1)' }} // Mirror the camera for natural feel
         />
         <canvas
@@ -170,19 +170,19 @@ export function ChaosMode() {
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           style={{ transform: 'scaleX(-1)' }}
         />
-        
+
         {!isChaosMode && (
           <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center justify-center px-4 z-50">
             {modelLoading ? (
               <div className="px-6 py-3 bg-black/80 backdrop-blur-md rounded-full text-white text-base md:text-xl font-bold animate-pulse border-2 border-white/20 text-center max-w-full">
-                Menyiapkan AI Kucing... 🐈
+                Menyiapkan Kucing... 🐈
               </div>
             ) : (
               <div className="px-6 py-3 bg-yellow-400/90 backdrop-blur-md rounded-full text-black text-lg md:text-2xl font-black shadow-[0_0_40px_rgba(250,204,21,0.6)] animate-bounce border-2 border-black text-center max-w-full">
                 GERAKKAN TANGANMU SEKARANG!! 🌪️
               </div>
             )}
-            
+
           </div>
         )}
       </div>
@@ -195,7 +195,7 @@ export function ChaosMode() {
             transition={{ duration: 0.5 }}
             className="mt-8 z-50 pointer-events-none"
           >
-            <motion.h1 
+            <motion.h1
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ repeat: Infinity, duration: 0.5 }}
               className="text-4xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-red-600 drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] uppercase italic transform -skew-x-12 text-center"
@@ -208,7 +208,7 @@ export function ChaosMode() {
 
       {/* Tombol Berhenti saat Chaos Mode */}
       {isChaosMode && (
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-6 px-8 py-3 bg-red-600/80 backdrop-blur-sm hover:bg-red-700 text-white rounded-full font-bold shadow-xl border-2 border-white/20 transition-all z-50"
         >
