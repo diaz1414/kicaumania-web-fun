@@ -2,11 +2,15 @@ import { motion } from 'framer-motion'
 import { Background3D } from './components/Background3D'
 import { ChaosMode } from './components/ChaosMode'
 import { ParticleSystem } from './components/ParticleSystem'
+import { ShareDrawer } from './components/ShareDrawer'
 import { useAppStore } from './store'
+import { useState } from 'react'
+import { Share2 } from 'lucide-react'
 
 function App() {
   const activateCamera = useAppStore(state => state.activateCamera)
   const isCameraActive = useAppStore(state => state.isCameraActive)
+  const [isShareOpen, setIsShareOpen] = useState(false)
 
   return (
     <div className={`min-h-screen bg-slate-900 text-white relative overflow-hidden transition-opacity duration-700 ${isCameraActive ? 'bg-black' : ''}`}>
@@ -115,9 +119,22 @@ function App() {
             </div>
           </motion.div>
 
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4 }}
+            onClick={() => setIsShareOpen(true)}
+            className="mt-12 flex items-center gap-2 px-6 py-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-full border border-slate-700/50 transition-all group"
+          >
+            <Share2 className="w-4 h-4 text-pink-500 group-hover:scale-125 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest text-slate-300">Bagikan Ritual</span>
+          </motion.button>
+
           <p className="mt-12 text-xs text-slate-600 italic">
             *Peringatan: Kamera akan aktif untuk mendeteksi kegacoran tangan Anda.
           </p>
+          
+          <ShareDrawer isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
         </motion.div>
       )}
     </div>
