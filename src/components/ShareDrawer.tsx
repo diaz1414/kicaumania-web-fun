@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Share2, X as CloseIcon, Link, MoreHorizontal } from 'lucide-react'
+import { Share2, X as CloseIcon, Link, MoreHorizontal, Check } from 'lucide-react'
 import { siInstagram, siX, siWhatsapp } from 'simple-icons'
+import { useState } from 'react'
 
 interface ShareDrawerProps {
   isOpen: boolean
@@ -8,8 +9,15 @@ interface ShareDrawerProps {
 }
 
 export const ShareDrawer = ({ isOpen, onClose }: ShareDrawerProps) => {
+  const [showCopyAlert, setShowCopyAlert] = useState(false)
   const shareUrl = "https://kicaumania.diaww.my.id/"
   const shareText = "Ikuti #KicauManiaChallenge! Ritual Kucing Gacor sedang viral di TikTok! 🦜🐱🔥"
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareUrl)
+    setShowCopyAlert(true)
+    setTimeout(() => setShowCopyAlert(false), 2000)
+  }
 
   const socialLinks = [
     { 
@@ -42,10 +50,7 @@ export const ShareDrawer = ({ isOpen, onClose }: ShareDrawerProps) => {
     { 
       name: 'Salin Link', 
       icon: <Link className="w-6 h-6 text-slate-400" />, 
-      action: () => {
-        navigator.clipboard.writeText(shareUrl)
-        alert('Link disalin ke clipboard! 🚀')
-      }
+      action: handleCopy
     },
     { 
       name: 'Lainnya', 
@@ -130,16 +135,40 @@ export const ShareDrawer = ({ isOpen, onClose }: ShareDrawerProps) => {
                   <span className="text-sm font-medium text-slate-300 truncate max-w-[200px]">{shareUrl}</span>
                </div>
                <button 
-                onClick={() => {
-                   navigator.clipboard.writeText(shareUrl)
-                   alert('Link disalin! 🚀')
-                }}
+                onClick={handleCopy}
                 className="px-4 py-2 bg-pink-600 text-white text-xs font-black rounded-lg hover:bg-pink-700 transition-colors uppercase"
                >
                  Salin
                </button>
             </div>
           </motion.div>
+
+          {/* Custom Copy Alert */}
+          <AnimatePresence>
+            {showCopyAlert && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[200] flex flex-col items-center gap-3 px-6 py-4 bg-yellow-400 rounded-3xl shadow-[0_20px_50px_rgba(250,204,21,0.4)] border-4 border-black"
+              >
+                <motion.img 
+                  src="/cat.gif" 
+                  alt="Gacor Cat" 
+                  className="w-16 h-16 rounded-xl border-2 border-black"
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ repeat: Infinity, duration: 0.5 }}
+                />
+                <div className="flex flex-col items-center">
+                  <span className="text-black font-black uppercase text-lg italic leading-tight">LINK DISALIN!</span>
+                  <span className="text-black font-bold uppercase text-[10px] tracking-[0.2em]">KUCING ANDA GACOR 🐈🔥</span>
+                </div>
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
+                   <Check className="w-4 h-4 text-white stroke-[4px]" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
